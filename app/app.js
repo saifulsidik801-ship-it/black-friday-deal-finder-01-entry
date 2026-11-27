@@ -3,7 +3,8 @@
 // done from the two prices in deals.js, so the discount on screen can never
 // disagree with the prices. No network calls: everything is local data.
 
-import { DEALS, SOURCES, CATEGORIES, STORES, CHECKED_AT } from "./deals.js";
+import { DEALS, SOURCES, CATEGORIES, STORES, COMPARE } from "./deals.js";
+import { CATEGORY_ICON } from "./icons.js";
 
 const money = (n) =>
   "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -31,11 +32,6 @@ const TILE_COLORS = {
   Beauty: ["#a21caf", "#db2777"],
   Gaming: ["#1e40af", "#059669"],
 };
-
-function initials(name) {
-  const words = name.replace(/[^A-Za-z0-9 ]/g, "").split(" ").filter(Boolean);
-  return (words[0][0] + (words[1] ? words[1][0] : words[0][1] || "")).toUpperCase();
-}
 
 const state = { q: "", cat: "All", store: "All", minPct: 0, verdict: "All", sort: "pct" };
 
@@ -68,7 +64,7 @@ function dealCard(d) {
   return `
   <article class="card" data-id="${d.id}">
     <div class="tile" style="background:linear-gradient(135deg,${c1},${c2})">
-      <span class="mono">${initials(d.name)}</span>
+      <span class="tile-icon">${CATEGORY_ICON[d.category] || ""}</span>
       <span class="tile-cat">${d.category}</span>
       <span class="pct-badge">−${pctOff(d)}%</span>
     </div>
@@ -82,7 +78,7 @@ function dealCard(d) {
       <div class="save-line">You save ${money(saved(d))} · ${pctOff(d)}% off</div>
       <div class="verdict ${v.cls}" title="${v.why}">${v.label}</div>
       <p class="why">${v.why}</p>
-      <p class="checked">Checked ${CHECKED_AT} · via ${src.name}</p>
+      <p class="checked">Checked ${d.at} · via ${src.name}</p>
       <a class="shop" href="${d.link}" target="_blank" rel="noopener">Shop at ${d.store} &rarr;</a>
     </div>
   </article>`;
@@ -152,6 +148,25 @@ function renderChips() {
   );
 }
 
+function renderCompare() {
+  document.getElementById("compare-rows").innerHTML = COMPARE.map((c) => {
+    const best = Math.min(...c.prices.map((p) => p.price));
+    const src = SOURCES[c.src];
+    return `<div class="compare-row">
+      <div class="compare-product">
+        <span class="compare-name">${c.product}</span>
+        <span class="compare-note">${c.note} · via ${src.name}</span>
+      </div>
+      <div class="compare-prices">${c.prices
+        .map(
+          (p) =>
+            `<span class="compare-price${p.price === best ? " best" : ""}">${p.store} <b>${money(p.price)}</b>${p.price === best ? ' <em>LOWEST</em>' : ""}</span>`
+        )
+        .join("")}</div>
+    </div>`;
+  }).join("");
+}
+
 function renderSources() {
   document.getElementById("sources").innerHTML = SOURCES.map(
     (s) => `<li><a href="${s.url}" target="_blank" rel="noopener">${s.name}</a> — ${s.note}</li>`
@@ -209,6 +224,7 @@ document.getElementById("sort-filter").addEventListener("change", (e) => {
 
 renderStats();
 renderTopPicks();
+renderCompare();
 renderChips();
 renderGrid();
 renderSources();

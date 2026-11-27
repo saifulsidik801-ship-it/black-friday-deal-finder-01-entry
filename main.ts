@@ -17,8 +17,15 @@ import { buildDossier } from "./vendor/makefun-frontend.ts";
 const repoRoot = dirname(fileURLToPath(import.meta.url));
 const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
 
-// Start from a clean output dir so a stale file can never leak into the entry.
-rmSync(outDir, { recursive: true, force: true });
+// Remove only our own outputs, never the whole output dir: the grader's
+// /output may hold entries we must not delete.
+for (const own of ["app", "screenshots", "dossier.json"]) {
+  try {
+    rmSync(join(outDir, own), { recursive: true, force: true });
+  } catch {
+    // already gone
+  }
+}
 mkdirSync(outDir, { recursive: true });
 
 const appOut = join(outDir, "app");

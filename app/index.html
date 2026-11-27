@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DealHawk — Black Friday 2026: 37 verified deals, checked today</title>
+<meta name="description" content="DealHawk finds real Black Friday 2026 deals and checks each price at the store or a deals source that names the store. Every deal shows sale price, usual price, discount and when it was checked.">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header>
+  <div class="head-inner">
+    <span class="eyebrow">Black Friday 2026 · Live today, Nov 27</span>
+    <h1>DEAL<span class="hawk">HAWK</span></h1>
+    <p class="tagline">Real Black Friday deals, <b>checked today</b> — every price read at the store or in a deals source that names the store, with the check time on every card. No inflated “was” prices, no guesses.</p>
+    <div class="stats">
+      <div class="stat"><span>Verified deals</span><b id="stat-deals">37</b></div>
+      <div class="stat"><span>Stores</span><b id="stat-stores">8</b></div>
+      <div class="stat"><span>Average cut</span><b id="stat-avg">—</b></div>
+      <div class="stat"><span>Total savings if you bought one of each</span><b id="stat-saved">—</b></div>
+      <div class="stat wide"><span>Biggest cut</span><b id="stat-best">—</b></div>
+      <div class="stat"><span>New lows</span><b id="stat-lows">—</b></div>
+    </div>
+  </div>
+</header>
+
+<div class="picks-bar">
+  <div class="picks-inner">
+    <div class="picks-label">TODAY'S BIGGEST CUTS</div>
+    <div id="top-picks" style="display:contents"></div>
+  </div>
+</div>
+
+<div class="filters">
+  <div class="filters-inner">
+    <div class="filter-row">
+      <input id="search" type="search" placeholder="Search deals — try “airpods”, “lego”, “dyson”…" aria-label="Search deals">
+      <select id="store-filter" aria-label="Filter by store"></select>
+      <select id="discount-filter" aria-label="Filter by discount"></select>
+      <select id="verdict-filter" aria-label="Filter by verdict"></select>
+      <select id="sort-filter" aria-label="Sort deals"></select>
+    </div>
+    <div class="chips" id="cat-chips"></div>
+    <div class="result-line">
+      <span id="result-count">37 of 37 deals</span>
+      <span id="active-filters">Showing: every verified deal</span>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+
+<div class="method">
+  <section>
+    <h2>How every deal was checked</h2>
+    <p>Each price on this page was read by our agent on <b>Friday, Nov 27, 2026</b> (Black Friday) at the store itself or in a deals source that names the store — the source is printed on every card, and the full source list is on the right. The discount is computed from the two prices shown, so the % can never disagree with them.</p>
+    <p><b>What the verdict means:</b> NEW LOW — the source called it the best price it has ever tracked. REAL DEAL — 30% or more off a real usual price. SOLID DEAL — 15–29% off, worth it if you wanted it anyway. ROUTINE SALE — under 15% off; fine, but not a reason to buy today.</p>
+    <p>Prices move all day on Black Friday. Confirm the price at checkout before you pay — a deal that sold out or moved is still listed here with the time it was checked, so you can see how fresh it is.</p>
+  </section>
+  <section>
+    <h2>Sources — where each price was read</h2>
+    <ul id="sources"></ul>
+    <p style="margin-top:10px">Store links go to each store's own search for the exact product, so the link always opens matching products at that store. DealHawk is an independent finder: it is not affiliated with any store named here, and store names are used only to say where a deal lives.</p>
+  </section>
+</div>
+
+<footer>
+  <b>DealHawk</b> · Black Friday 2026 · All 37 deals price-checked Nov 27, 2026, 2:20 PM WIB · Prices change — confirm at checkout.
+</footer>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>

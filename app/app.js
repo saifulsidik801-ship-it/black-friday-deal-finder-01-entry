@@ -2,9 +2,15 @@
 // stats bar, and the working search + filter + sort controls. All maths is
 // done from the two prices in deals.js, so the discount on screen can never
 // disagree with the prices. No network calls: everything is local data.
+//
+// v3 changes: each card shows its own product glyph (not the category
+// picture) on a gradient picked from the product type, so two cards in the
+// same category no longer look identical; each card carries a price-history
+// line from deals.js; the top-picks strip takes the biggest cut from three
+// DIFFERENT stores, so one store can no longer sweep all three slots.
 
 import { DEALS, SOURCES, CATEGORIES, STORES, COMPARE } from "./deals.js";
-import { CATEGORY_ICON } from "./icons.js";
+import { CATEGORY_ICON, PRODUCT_ICON } from "./icons.js";
 
 const money = (n) =>
   "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -22,16 +28,28 @@ function verdict(d) {
   return { label: "ROUTINE SALE", cls: "v-routine", why: "Only " + p + "% off. Fine, but not the reason to buy today." };
 }
 
-const TILE_COLORS = {
-  Tech: ["#1d4ed8", "#7c3aed"],
-  TV: ["#0f766e", "#0369a1"],
-  Audio: ["#be185d", "#7c3aed"],
-  Home: ["#b45309", "#dc2626"],
-  Toys: ["#15803d", "#ca8a04"],
-  Fashion: ["#9d174d", "#ea580c"],
-  Beauty: ["#a21caf", "#db2777"],
-  Gaming: ["#1e40af", "#059669"],
-};
+// Ten tile gradients. A card's gradient comes from its product type, not
+// its category, so a shoe, a jacket and a handbag in Fashion each get their
+// own colour and their own picture — nothing repeats at a glance.
+const TILE_GRADIENTS = [
+  ["#1d4ed8", "#7c3aed"],
+  ["#0f766e", "#0369a1"],
+  ["#be185d", "#7c3aed"],
+  ["#b45309", "#dc2626"],
+  ["#15803d", "#ca8a04"],
+  ["#9d174d", "#ea580c"],
+  ["#a21caf", "#db2777"],
+  ["#1e40af", "#059669"],
+  ["#7c2d12", "#b91c1c"],
+  ["#334155", "#0f766e"],
+];
+
+function tileGradient(d) {
+  const key = d.ic || d.category;
+  let h = 0;
+  for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+  return TILE_GRADIENTS[h % TILE_GRADIENTS.length];
+}
 
 const state = { q: "", cat: "All", store: "All", minPct: 0, verdict: "All", sort: "pct" };
 
@@ -59,12 +77,16 @@ function filteredDeals() {
 
 function dealCard(d) {
   const v = verdict(d);
-  const [c1, c2] = TILE_COLORS[d.category] || ["#334155", "#0f172a"];
+  const [c1, c2] = tileGradient(d);
   const src = SOURCES[d.src];
+  const icon = (d.ic && PRODUCT_ICON[d.ic]) || CATEGORY_ICON[d.category] || "";
+  const history = d.hist
+    ? `<p class="history"><b>Price history:</b> ${d.hist}</p>`
+    : "";
   return `
   <article class="card" data-id="${d.id}">
     <div class="tile" style="background:linear-gradient(135deg,${c1},${c2})">
-      <span class="tile-icon">${CATEGORY_ICON[d.category] || ""}</span>
+      <span class="tile-icon">${icon}</span>
       <span class="tile-cat">${d.category}</span>
       <span class="pct-badge">−${pctOff(d)}%</span>
     </div>
@@ -78,6 +100,7 @@ function dealCard(d) {
       <div class="save-line">You save ${money(saved(d))} · ${pctOff(d)}% off</div>
       <div class="verdict ${v.cls}" title="${v.why}">${v.label}</div>
       <p class="why">${v.why}</p>
+      ${history}
       <p class="checked">Checked ${d.at} · via ${src.name}</p>
       <a class="shop" href="${d.link}" target="_blank" rel="noopener">Shop at ${d.store} &rarr;</a>
     </div>
@@ -97,8 +120,19 @@ function renderStats() {
   document.getElementById("stat-lows").textContent = lows + " new lows";
 }
 
+// Biggest cut from three different stores: walk the deals from the biggest
+// cut down and take the first deal from each store not already picked, so
+// the strip shows the spread of the sale instead of one store's clearance.
 function renderTopPicks() {
-  const picks = [...DEALS].sort((a, b) => pctOff(b) - pctOff(a)).slice(0, 3);
+  const ranked = [...DEALS].sort((a, b) => pctOff(b) - pctOff(a));
+  const picks = [];
+  const seenStores = new Set();
+  for (const d of ranked) {
+    if (picks.length >= 3) break;
+    if (seenStores.has(d.store)) continue;
+    seenStores.add(d.store);
+    picks.push(d);
+  }
   document.getElementById("top-picks").innerHTML = picks
     .map((d, i) => {
       const v = verdict(d);

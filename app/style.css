@@ -186,6 +186,12 @@ main { max-width: 1240px; margin: 0 auto; padding: 18px 20px 8px; }
 .v-solid { background: #0369a1; }
 .v-routine { background: #64748b; }
 .why { margin: 0; font-size: 13px; color: var(--muted); }
+.history {
+  margin: 0; font-size: 13px; color: #3f4a5a;
+  background: #fdf6e3; border-left: 3px solid var(--gold);
+  padding: 6px 9px; border-radius: 0 6px 6px 0;
+}
+.history b { color: var(--navy); }
 .checked { margin: 0; font-size: 12px; color: var(--muted); }
 .shop {
   margin-top: auto;
